@@ -4,7 +4,7 @@ from functools import partial
 
 from extensions.super.precursor import find_static_caller
 
-SANITY_CHECKS = False
+SANITY_CHECKS = True
 
 
 class SuperCaller:
