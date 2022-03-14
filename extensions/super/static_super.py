@@ -38,9 +38,7 @@ def static_super():
 
 def static_super_of(superclass):
     calling_frame = inspect.getouterframes(inspect.currentframe())[1]
-    argspec = inspect.getargvalues(calling_frame.frame)
-    assert len(argspec.args) >= 1, 'static_super_of() must be called from a method'
-    target = argspec.locals[argspec.args[0]]
+    target, calling_class = find_static_caller(calling_frame)
     if SANITY_CHECKS:
         method = calling_frame.function
         try:
@@ -49,7 +47,7 @@ def static_super_of(superclass):
             raise Exception('static_super_of() must be called from a method')
         if not inspect.isclass(superclass):
             raise Exception(f'Superclass {superclass} must be a class for static_super_of()')
-        if superclass not in target.__class__.__mro__:
+        if superclass not in calling_class.__mro__[1:]:
             raise Exception(
                 f'Superclass {superclass} must be a superclass of {target.__class__.__qualname__} for static_super_of()')
     chosen_superclass = superclass
