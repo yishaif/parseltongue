@@ -53,10 +53,7 @@ def precursor(*args, **kwargs):
 
 def precursor_of(superclass):
     calling_frame = inspect.getouterframes(inspect.currentframe())[1]
-    argspec = inspect.getargvalues(calling_frame.frame)
-    assert len(argspec.args) >= 1, 'precursor() must be called from a method'
-    target = argspec.locals[argspec.args[0]]
-    # assert inspect.ismethod(target)
+    target, calling_class = find_static_caller(calling_frame)
     method = calling_frame.function
     if SANITY_CHECKS:
         try:
@@ -65,7 +62,7 @@ def precursor_of(superclass):
             raise Exception('precursor_of() must be called from a method')
         if not inspect.isclass(superclass):
             raise Exception(f'Superclass {superclass} must be a class for precursor_of()')
-        if superclass not in target.__class__.__mro__:
+        if superclass not in calling_class.__mro__[1:]:
             raise Exception(
                 f'Superclass {superclass} must be a superclass of {target.__class__.__qualname__} for precursor_of()')
     chosen_superclass = superclass
